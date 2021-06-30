@@ -1,3 +1,5 @@
+#https://towardsdatascience.com/how-to-get-stock-data-using-python-c0de1df17e75
+
 import yfinance as yf
 import streamlit as st
 
