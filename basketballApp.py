@@ -1,3 +1,4 @@
+# Data source - https://www.basketball-reference.com/
 import streamlit as st
 import pandas as pd
 import base64
@@ -43,6 +44,7 @@ st.write('Data Dimension: ' + str(df_selected_team.shape[0]) + ' rows and ' + st
 st.dataframe(df_selected_team)
 
 # Download NBA player stats data
+# Download created a csv file (output.csv)
 def filedownload(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
