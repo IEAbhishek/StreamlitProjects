@@ -46,3 +46,26 @@ def filedownload(df):
     href = f'<a href="data:file/csv;base64,{b64}" download="SP500.csv">Download CSV File</a>'
     return href
 st.markdown(filedownload(df_selected_sector), unsafe_allow_html=True)
+
+data = yf.download(
+        tickers = list(df_selected_sector[:10].Symbol),
+        period = "ytd",
+        interval = "1d",
+        group_by = 'ticker',
+        auto_adjust = True,
+        prepost = True,
+        threads = True,
+        proxy = None
+    )
+
+# Closing Price Plot
+def price_plot(symbol):
+  df = pd.DataFrame(data[symbol].Close)
+  df['Date'] = df.index
+  plt.fill_between(df.Date, df.Close, color='skyblue', alpha=0.3)
+  plt.plot(df.Date, df.Close, color='skyblue', alpha=0.8)
+  plt.xticks(rotation=90)
+  plt.title(symbol, fontweight='bold')
+  plt.xlabel('Date', fontweight='bold')
+  plt.ylabel('Closing Price', fontweight='bold')
+  return st.pyplot()
