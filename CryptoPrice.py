@@ -76,3 +76,45 @@ def load_data():
     df['volume_24h'] = volume_24h
     return df
 df = load_data()
+
+## Sidebar - Cryptocurrency selections
+sorted_coin = sorted( df['coin_symbol'] )
+selected_coin = col1.multiselect('Cryptocurrency', sorted_coin, sorted_coin)
+
+df_selected_coin = df[ (df['coin_symbol'].isin(selected_coin)) ] # Filtering data
+
+## Sidebar - Number of coins to display
+num_coin = col1.slider('Display Top N Coins', 1, 100, 100)
+df_coins = df_selected_coin[:num_coin]
+
+## Sidebar - Percent change timeframe
+percent_timeframe = col1.selectbox('Percent change time frame',
+                                    ['7d','24h', '1h'])
+percent_dict = {"7d":'percent_change_7d',"24h":'percent_change_24h',"1h":'percent_change_1h'}
+selected_percent_timeframe = percent_dict[percent_timeframe]
+
+## Sidebar - Sorting values
+sort_values = col1.selectbox('Sort values?', ['Yes', 'No'])
+
+col2.subheader('Price Data of Selected Cryptocurrency')
+col2.write('Data Dimension: ' + str(df_selected_coin.shape[0]) + ' rows and ' + str(df_selected_coin.shape[1]) + ' columns.')
+
+col2.dataframe(df_coins)
+
+# Download CSV data
+def filedownload(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
+    href = f'<a href="data:file/csv;base64,{b64}" download="crypto.csv">Download CSV File</a>'
+    return href
+
+col2.markdown(filedownload(df_selected_coin), unsafe_allow_html=True)
+col2.subheader('Table of % Price Change')
+df_change = pd.concat([df_coins.coin_symbol, df_coins.percent_change_1h, df_coins.percent_change_24h, df_coins.percent_change_7d], axis=1)
+df_change = df_change.set_index('coin_symbol')
+df_change['positive_percent_change_1h'] = df_change['percent_change_1h'] > 0
+df_change['positive_percent_change_24h'] = df_change['percent_change_24h'] > 0
+df_change['positive_percent_change_7d'] = df_change['percent_change_7d'] > 0
+col2.dataframe(df_change)
+
+col3.subheader('Bar plot of % Price Change')
