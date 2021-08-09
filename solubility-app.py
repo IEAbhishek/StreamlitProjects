@@ -59,3 +59,19 @@ st.write("""
 """)
 
 st.sidebar.header('User Input Features')
+
+SMILES_input = "NCCCC\nCCC\nCN"
+SMILES = st.sidebar.text_area("SMILES input", SMILES_input)
+SMILES = "C\n" + SMILES #Adds C as a dummy, first item
+SMILES = SMILES.split('\n')
+st.header('Input SMILES')
+SMILES[1:]
+
+## Calculate molecular descriptors
+st.header('Computed molecular descriptors')
+X = generate(SMILES)
+X[1:]
+load_model = pickle.load(open('solubility_model.pkl', 'rb'))
+prediction = load_model.predict(X)
+st.header('Predicted LogS values')
+prediction[1:] # Skips the dummy first item
